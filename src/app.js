@@ -109,10 +109,6 @@ app.get('/bookmarks', async (req, res) => {
   fields._id = false
   fields.__v = false
 
-  // console.log(fields);
-
-  console.log(filter)
-
   User.findOne(filter)
     .sort(sortQuery)
     .limit(4)
@@ -141,7 +137,7 @@ app.get('/favorites', async (req, res) => {
   try {
     var userTwitterDataActual = await twitterClient.get('users/show', { screen_name: req.query.screen_name }) // todo: what if tweet deleted?
   } catch (error) {
-    res.send({ twitterError: error })
+    res.send({ twitterError: error }) // todo: make consistent on the front end
     throw error
   }
 
@@ -176,8 +172,6 @@ app.get('/favorites', async (req, res) => {
 
   var filter = req.query.filter ? req.query.filter : {}
   var sortQuery = req.query.sort ? req.query.sort : {}
-
-  console.log(req.query)
 
   if (filter.$and) {
     filter.$and.push({ 'id_str': userTwitterDataActual.id_str })
