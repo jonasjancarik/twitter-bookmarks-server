@@ -155,6 +155,7 @@ app.get('/favorites', async (req, res) => {
   })
 
   // save favorites IDs
+  // todo: fix: this needs to be synchronous - need to wait for this before making the next db query
   User.findOneAndUpdate({ id_str: userTwitterDataActual.id_str },
     {
       $set: { twitterUserData: userTwitterDataActual },
@@ -182,7 +183,6 @@ app.get('/favorites', async (req, res) => {
   // todo: do as aggregation to allow skipping?
   User.findOne(filter)
     .sort(sortQuery)
-    .limit(12)
     .select('favorites')
     .lean()
     .exec(function (error, result) {
