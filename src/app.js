@@ -39,16 +39,24 @@ app.get('/', (req, res) => {
 })
 
 app.get('/user', async (req, res) => {
-  if (!req.query.screen_name) {
-    res.send('You have to specify a Twitter username (screen_name).')
+  if (!req.query.screen_name && !req.query.user_id) {
+    res.send('You have to specify a Twitter username (screen_name) or a Twitter ID (user_id).')
     return
   }
   // initiate Twitter
   var twitterClient = twitterConnect()
 
   // get up to date user data from Twitter, including ID
+
+  if (req.query.screen_name) {
+    var twOptions = { screen_name: req.query.screen_name }
+  } else {
+    twOptions = { user_id: req.query.user_id }
+  }
+
+  console.log(twOptions)
   try {
-    var userTwitterDataActual = await twitterClient.get('users/show', { screen_name: req.query.screen_name }) // todo: what if tweet deleted?
+    var userTwitterDataActual = await twitterClient.get('users/show', twOptions) // todo: what if tweet deleted?
   } catch (error) {
     res.send({ twitterError: error })
     throw error
