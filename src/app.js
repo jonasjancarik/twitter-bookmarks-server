@@ -25,12 +25,12 @@ app.use(cors())
   }
 })()
 
-function twitterConnect () {
+function twitterConnect (options = {}) {
   return new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token_key: process.env.ACCESS_TOKEN_KEY,
-    access_token_secret: process.env.ACCESS_TOKEN_SECRET
+    access_token_key: options.accessTokenKey || process.env.ACCESS_TOKEN_KEY,
+    access_token_secret: options.accessTokenSecret || process.env.ACCESS_TOKEN_SECRET
   })
 }
 
@@ -44,7 +44,7 @@ app.get('/user', async (req, res) => {
     return
   }
   // initiate Twitter
-  var twitterClient = twitterConnect()
+  var twitterClient = twitterConnect({ accessTokenKey: req.query.twitterCredentials.accessToken, accessTokenSecret: req.query.twitterCredentials.secret })
 
   // get up to date user data from Twitter, including ID
 
@@ -54,7 +54,6 @@ app.get('/user', async (req, res) => {
     twOptions = { user_id: req.query.user_id }
   }
 
-  console.log(twOptions)
   try {
     var userTwitterDataActual = await twitterClient.get('users/show', twOptions) // todo: what if tweet deleted?
   } catch (error) {
@@ -82,8 +81,10 @@ app.get('/bookmarks', async (req, res) => {
     return
   }
 
+  console.log(req.query)
+
   // initiate Twitter
-  var twitterClient = twitterConnect()
+  var twitterClient = twitterConnect({ accessTokenKey: req.query.twitterCredentials.accessToken, accessTokenSecret: req.query.twitterCredentials.secret })
 
   // get up to date user data from Twitter, including ID
   try {
@@ -92,6 +93,8 @@ app.get('/bookmarks', async (req, res) => {
     res.send({ twitterError: error })
     throw error
   }
+
+  console.log(userTwitterDataActual)
 
   var filter = req.query.filter ? req.query.filter : {}
   var fields = req.query.fields ? req.query.fields : {}
@@ -139,7 +142,7 @@ app.get('/favorites', async (req, res) => {
   }
 
   // initiate Twitter
-  var twitterClient = twitterConnect()
+  var twitterClient = twitterConnect({ accessTokenKey: req.query.twitterCredentials.accessToken, accessTokenSecret: req.query.twitterCredentials.secret })
 
   // get up to date user data from Twitter, including ID
   try {
