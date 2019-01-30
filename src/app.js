@@ -206,6 +206,16 @@ app.get('/favorites', async (req, res) => {
     })
 })
 
-console.log('Server listening on port ' + (process.env.PORT || 8081))
+var port = 8081
+startListening(Number(process.env.PORT) || port)
 
-app.listen(process.env.PORT || 8081)
+function startListening (port) {
+  console.log('Trying to listen on port ' + port)
+  app.listen(port).on('error', function (err) {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is already in use. Trying port ${port + 1}`)
+      debugger
+      startListening(port + 1)
+    }
+  })
+}
